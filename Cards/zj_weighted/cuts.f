@@ -967,7 +967,7 @@ c How to enhance the tails is very process dependent. For example for
 c top quark production one could use:
       do i=1,nexternal
         do j=i+1,nexternal
-           if (abs(ipdg(i)).eq.18.and.(ipdg(i).eq.-ipdg(j))) then
+           if (abs(ipdg(i)).eq.14.and.(ipdg(i).eq.-ipdg(j))) then
               bias_wgt=sqrt(p(1,i)**2+p(2,i)**2)**3
            endif
         enddo
