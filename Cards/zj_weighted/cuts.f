@@ -958,26 +958,36 @@ c      'bias' = event_norm
 c
       implicit none
       include 'nexternal.inc'
-      double precision bias_wgt,p(0:3,nexternal),H_T
-      integer ipdg(nexternal),i,j
+      double precision bias_wgt,p(0:3,nexternal),H_T,ptz,ptz_wgt,njets_wgt
+      integer ipdg(nexternal),i,j,njets
 
-      bias_wgt=1d0
+      ptz_wgt=1d0
 
-c How to enhance the tails is very process dependent. For example for
-c top quark production one could use:
-      do i=1,nexternal
-        do j=i+1,nexternal
-           if (abs(ipdg(i)).eq.14.and.(ipdg(i).eq.-ipdg(j))) then
-              bias_wgt=sqrt(p(1,i)**2+p(2,i)**2)**3
-           endif
-        enddo
+      do i=0,nexternal
+         do j=i+1,nexternal
+            if ((abs(ipdg(i)).eq.14).and.(ipdg(i).eq.-ipdg(j))) then
+              ptz=dsqrt((p(1,i)+p(1,j))**2 + (p(2,i)+p(2,j))**2)
+              ptz_wgt=25d0+ptz**2
+            endif
+         enddo
       enddo
-c Or to use H_T^2 one does     
-c      H_T=0d0
-c      do i=3,nexternal
-c         H_T=H_T+sqrt(max(0d0,(p(0,i)+p(3,i))*(p(0,i)-p(3,i))))
-c      enddo
-c      bias_wgt=H_T**2
+
+c     find the jets (skip first two partons, since these are the incoming ones)
+      njets=0
+      do i=3,nexternal
+         if (abs(ipdg(i)).le.maxjetflavor .or. ipdg(i).eq.21) then
+            njets=njets+1
+         endif
+      enddo
+      
+!       subtract real emission from jet counting
+      njets = njets-1
+      
+!       approximately compensating for xsec decrease in powers of alphaS
+      njets_wgt = 10d0**njets
+            
+!       combined weight
+      bias_wgt=ptz_wgt*njets_wgt
 
       return
       end
