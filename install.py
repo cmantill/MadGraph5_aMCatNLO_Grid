@@ -10,7 +10,7 @@ import random
 
 eos='/afs/cern.ch/project/eos/installation/0.3.84-aquamarine/bin/eos.select'
 #MGrelease="2_5_2"
-MGrelease="2_5_3"
+MGrelease="2_5_1"
 #MGrelease="2_4_3"
 
 def completed(name,medrange,dmrange,basedir,carddir):
@@ -136,7 +136,8 @@ def replace(name,med,dm,gdm,gq,proc,rand,directory):
 def fileExists(user,filename):
    sc=None
    #print '%s ls eos/cms/store/user/%s/gridpack/%s | wc -l' %(eos,user,filename)
-   exists = commands.getoutput('%s ls eos/cms/store/user/%s/gridpack/%s | wc -l' %(eos,user,filename)  )
+   #exists = commands.getoutput('%s ls eos/cms/store/user/%s/gridpack/%s | wc -l' %(eos,user,filename)  )
+   exists = commands.getoutput('ls /eos/user/c/cmantill/gridpack/%s | wc -l' %(filename)  )
    if len(exists.splitlines()) > 1: 
       exists = exists.splitlines()[1]
    else:
@@ -167,17 +168,16 @@ def checkRestrict(iRestrict,iMMED,iMDM):
 aparser = argparse.ArgumentParser(description='Process benchmarks.')
 aparser.add_argument('-carddir','--carddir'   ,action='store',dest='carddir',default='Cards/Axial_MonoTop_NLO_Mphi_Mchi_gSM-0p25_gDM-1p0_13TeV-madgraph'   ,help='carddir')
 aparser.add_argument('-q'      ,'--queue'      ,action='store',dest='queue'  ,default='2nw'                   ,help='queue')
-#aparser.add_argument('-dm'      ,'--dmrange'   ,dest='dmrange' ,nargs='+',type=int,default=[1,10,50,75,100,150,200,300,350,450,500,600,700,1000],help='mass range')
-#aparser.add_argument('-med'     ,'--medrange'  ,dest='medrange',nargs='+',type=int,default=[10,20,50,100,200,300,350,400,500,750,1000,1250,1500,1750,2000,2250,10000],help='mediator range')
 aparser.add_argument('-dm'      ,'--dmrange'   ,dest='dmrange' ,nargs='+',type=int,default=[1,5,10,50,75,100,150,200,300,400,350,450,500,600,700,1000,3000,4000],help='mass range')
-aparser.add_argument('-med'     ,'--medrange'  ,dest='medrange',nargs='+',type=int,default=[10,20,50,100,125,200,300,350,400,500,750,1000,1250,1500,1750,2000,2250,2500,3000,3500,4000,4500,5000,6000,7000,8000,10000],help='mediator range')
-aparser.add_argument('-proc'    ,'--proc'      ,dest='procrange',nargs='+',type=int,     default=[800],help='proc')
-aparser.add_argument('-gq'      ,'--gq'        ,dest='gq',nargs='+',type=float,      default=[0.25],help='gq')
-aparser.add_argument('-gdm'     ,'--gdm'       ,dest='gdm',nargs='+',type=float,     default=[0.1],help='gdm')
+aparser.add_argument('-med'     ,'--medrange'  ,dest='medrange',nargs='+',type=int,default=[10,20,50,100,125,150,200,300,350,400,500,750,1000,1250,1500,1750,2000,2250,2500,3000,3500,4000,4500,5000,6000,7000,8000,10000],help='mediator range')
+#aparser.add_argument('-med'     ,'--medrange'  ,dest='medrange',nargs='+',type=int,default=[4000,4500,5000,5500,6000,7000,8000,10000],help='mediator range')
+aparser.add_argument('-proc'    ,'--proc'      ,dest='procrange',nargs='+',type=int,     default=[805],help='proc')
+aparser.add_argument('-gq'      ,'--gq'        ,dest='gq',nargs='+',type=float,      default=[1.0],help='gq')
+aparser.add_argument('-gdm'     ,'--gdm'       ,dest='gdm',nargs='+',type=float,     default=[1.0],help='gdm')
 aparser.add_argument('-resubmit','--resubmit'  ,type=bool      ,dest='resubmit',default=False,help='resubmit')
 aparser.add_argument('-install' ,'--install'   ,type=bool      ,dest='install' ,default=True ,help='install MG')
 aparser.add_argument('-runcms'  ,'--runcms'    ,action='store' ,dest='runcms'  ,default='runcmsgrid_NLO.sh',help='runcms')
-aparser.add_argument('-release' ,'--release'    ,action='store' ,dest='release'  ,default='2_5_1',help='MG version')
+aparser.add_argument('-release' ,'--release'    ,action='store' ,dest='release'  ,default='2_6_0',help='MG version')
 
 args1 = aparser.parse_args()
 MGrelease=args1.release
@@ -205,8 +205,9 @@ procnamebase = commands.getoutput('cat %s | grep output | awk \'{print $2}\' ' %
 ##Start with the basics download Madgraph and add the options we care  :
 if not args1.resubmit and args1.install:
     #os.system('rm -rf /tmp/%s/CMSSW_7_1_25_patch5' % user)
-    os.system('rm -rf /tmp/%s/CMSSW_7_1_20' % user)
+    #os.system('rm -rf /tmp/%s/CMSSW_7_1_20' % user)
     #os.system('rm -rf /tmp/%s/CMSSW_9_0_0_pre2' % user)
+    os.system('rm -rf /tmp/%s/CMSSW_9_3_0_pre1' % user)
     os.system('rm -rf /tmp/%s/MG5_aMC_v%s'  % (user,MGrelease))
     os.system('cp  patches/install.sh .')
     os.system('./install.sh %s' % args1.release)
@@ -218,7 +219,7 @@ os.chdir (('%s_MG5_aMC_v'+MGrelease) % procnamebase)
 if not args1.resubmit and args1.install:
     os.system("cp "+basedir+"/"+args1.carddir+"/%s ." % mgcf[0])
     #os.system("cp /afs/cern.ch/work/b/bmaier/public/xMadGraph243/lhe_parser.py ./madgraph/various/")
-    os.system("cp /afs/cern.ch/user/p/pharris/pharris/public/amcatnlo_run_interface.py ./madgraph/interface/amcatnlo_run_interface.py")
+    #os.system("cp /afs/cern.ch/user/p/pharris/pharris/public/amcatnlo_run_interface.py ./madgraph/interface/amcatnlo_run_interface.py")
     os.system("./bin/mg5_aMC %s" % mgcf[0])
 
 ##Now build the directories iterating over options
@@ -230,7 +231,7 @@ for f in parameterdir:
     os.system('cp -r %s/%s/%s models/%s' % (basedir,args1.carddir,f,f))
     os.chdir('models/%s' % (f))
     os.system('python write_param_card.py')
-    #os.system('cp param_card.dat restrict_test.dat')
+    os.system('cp param_card.dat restrict_test.dat')
     os.chdir(('%s/%s_MG5_aMC_v'+MGrelease) % (basedir,procnamebase))
 
 restrict = loadRestrict(basedir+"/"+args1.carddir+"/"+rtct[0])
@@ -255,7 +256,7 @@ for med    in args1.medrange:
                     replace(procnamebase,tmpMed,tmpDM,args1.gdm[0],args1.gq[0],pProc,rand,'models/%s_%s_%s_%s' % (f,tmpMed,tmpDM,pProc))
                     os.chdir('models/%s_%s_%s_%s' % (f,tmpMed,tmpDM,pProc))
                     os.system('python write_param_card.py')
-                    #os.system('cp param_card.dat restrict_test.dat')
+                    os.system('cp param_card.dat restrict_test.dat')
                     os.chdir(('%s/%s_MG5_aMC_v'+MGrelease) % (basedir,procnamebase))
                     os.system('mkdir MG_%s' % (procname))
                 
@@ -279,8 +280,8 @@ for med    in args1.medrange:
                 #job_file.write('cd CMSSW_7_1_25_patch5/src \n')
                 #job_file.write('scramv1 project CMSSW CMSSW_7_1_20 \n')
                 #job_file.write('cd CMSSW_7_1_20/src \n')
-                job_file.write('scramv1 project CMSSW CMSSW_9_0_0_pre2 \n')
-                job_file.write('cd CMSSW_9_0_0_pre2/src \n')
+                job_file.write('scramv1 project CMSSW CMSSW_9_3_0_pre1 \n')
+                job_file.write('cd CMSSW_9_3_0_pre1/src \n')
                 job_file.write('eval `scramv1 runtime -sh` \n')
                 job_file.write('LHAPDF6TOOLFILE=$CMSSW_BASE/config/toolbox/$SCRAM_ARCH/tools/available/lhapdf6.xml \n')
                 job_file.write('if [ -e $LHAPDF6TOOLFILE ]; then \n')
@@ -312,8 +313,8 @@ for med    in args1.medrange:
                         pReweight=True
                 if args1.runcms.find("NLO") > -1:
                     job_file.write('echo "shower=OFF" > makegrid.dat  \n')
-                    if pReweight:
-                        job_file.write('echo "reweight=OFF" >> makegrid.dat  \n')
+                    #if pReweight:
+                    #    job_file.write('echo "reweight=OFF" >> makegrid.dat  \n')
                 job_file.write('echo "done"              >>  makegrid.dat  \n')
                 if len(cust) > 0:
                     job_file.write('cat %s >> makegrid.dat \n' % (cust[0]))
@@ -381,8 +382,10 @@ for med    in args1.medrange:
                 output  ='%s_tarball.tar.xz'                    % (procname)
                 job_file.write('XZ_OPT="--lzma2=preset=9,dict=512MiB" tar -cJpsf '+output+' mgbasedir process runcmsgrid.sh \n')
                 #job_file.write(('cp -r %s  %s/%s_MG5_aMC_v'+MGrelease+'/         \n') % (output,basedir,procnamebase))
-                job_file.write(('%s rm  eos/cms/store/user/%s/gridpack/%s  \n') % (eos,user,output))
-                job_file.write(('cp %s   /eos/cms/store/user/%s/gridpack/%s  \n') % (output,user,output))
+                job_file.write(('rm  /eos/user/c/cmantill/gridpack/%s  \n') % (output))
+                job_file.write(('cp %s  /eos/user/c/cmantill/gridpack/%s  \n') % (output,output))
+                #job_file.write(('%s rm  eos/cms/store/user/%s/gridpack/%s  \n') % (eos,user,output))
+                #job_file.write(('cp %s   /eos/cms/store/user/%s/gridpack/%s  \n') % (output,user,output))
                 job_file.close()
                 os.chmod(('%s/%s_MG5_aMC_v'+MGrelease+'/MG_%s/integrate.sh')             % (basedir,procnamebase,procname),0777)
             if os.path.isfile(('%s/%s_MG5_aMC_v'+MGrelease+'/MG_%s/integrate.sh')        % (basedir,procnamebase,procname)):

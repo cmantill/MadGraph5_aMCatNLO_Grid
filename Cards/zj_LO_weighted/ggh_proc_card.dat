@@ -1,0 +1,4 @@
+import model loop_sm
+generate    p p  > vm vm~ j / w+ w- a h 
+output zj_lo_pt125 -nojpeg
+

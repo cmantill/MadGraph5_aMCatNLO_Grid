@@ -43,7 +43,6 @@ user=`id -u -n`
 #    scramv1 project CMSSW CMSSW_7_1_25_patch5
 #fi 
 #cd /tmp/$user/CMSSW_7_1_25_patch5/src
-
 #if [ ! -d "/tmp/$user/CMSSW_7_1_20" ]; then
 #    cd /tmp/$user
 #    scramv1 project CMSSW CMSSW_7_1_20
@@ -54,9 +53,9 @@ user=`id -u -n`
 export SCRAM_ARCH=slc6_amd64_gcc530
 if [ ! -d "/tmp/$user/CMSSW_9_0_0_pre2" ]; then
     cd /tmp/$user
-    scramv1 project CMSSW CMSSW_9_0_0_pre2
+    scramv1 project CMSSW CMSSW_9_3_0_pre1
 fi 
-cd /tmp/$user/CMSSW_9_0_0_pre2/src
+cd /tmp/$user/CMSSW_9_3_0_pre1/src
 eval `scramv1 runtime -sh`
 cd $RUNHOME
 echo $CMSSW_BASE
