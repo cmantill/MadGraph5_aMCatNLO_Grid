@@ -1,7 +1,7 @@
 import HttEFT_UFO_MED_XMASS_PROC
 # Define multiparticle labels
 generate       p p  > h j   [QCD]
-output hj_eft_v2
+output hj_eft_v3_inc
 
 
 

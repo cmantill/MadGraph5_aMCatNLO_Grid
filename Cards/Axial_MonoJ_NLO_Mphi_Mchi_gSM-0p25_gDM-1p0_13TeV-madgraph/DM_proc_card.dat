@@ -2,7 +2,7 @@ import DMsimp_s_spin1_MED_XMASS_PROC-test
 # Define multiparticle labels
 generate       p p  > xd xd~ j   / h w+ w- z a [QCD]
 add process    p p  > xd xd~ j j / h w+ w- z a [QCD]
-output Axial_MonoJR3_NLO_Mphi-MED_Mchi-XMASS_gSM-0p25_gDM-1p0_13TeV-madgraph
+output Axial_MonoJ_NLO_Mphi-MED_Mchi-XMASS_gSM-0p25_gDM-1p0_13TeV-madgraph -nojpeg
 
 
 

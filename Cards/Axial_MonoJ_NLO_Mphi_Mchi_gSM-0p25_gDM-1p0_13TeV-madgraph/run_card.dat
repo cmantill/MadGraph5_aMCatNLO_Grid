@@ -36,7 +36,7 @@
 # Normalize the weights of LHE events such that they sum or average to *
 # the total cross section                                              *
 #***********************************************************************
-  average	= event_norm ! average or sum
+  bias	= event_norm ! average or sum
 #***********************************************************************
 # Number of points per itegration channel (ignored for aMC@NLO runs)   *
 #***********************************************************************
@@ -62,7 +62,7 @@
 # PDF choice: this automatically fixes also alpha_s(MZ) and its evol.  *
 #***********************************************************************
   lhapdf	= pdlabel ! PDF set
-  260000	= lhaid ! If pdlabel=lhapdf, this is the lhapdf number. Only 
+  303400	= lhaid ! If pdlabel=lhapdf, this is the lhapdf number. Only 
               ! numbers for central PDF sets are allowed. Can be a list; 
               ! PDF sets beyond the first are included via reweighting.
 #***********************************************************************

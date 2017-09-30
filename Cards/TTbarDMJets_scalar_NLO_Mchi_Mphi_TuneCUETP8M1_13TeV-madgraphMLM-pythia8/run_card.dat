@@ -62,7 +62,7 @@
 # PDF choice: this automatically fixes also alpha_s(MZ) and its evol.  *
 #***********************************************************************
   lhapdf	= pdlabel ! PDF set
-  260000	= lhaid ! If pdlabel=lhapdf, this is the lhapdf number. Only 
+  303400	= lhaid ! If pdlabel=lhapdf, this is the lhapdf number. Only 
               ! numbers for central PDF sets are allowed. Can be a list; 
               ! PDF sets beyond the first are included via reweighting.
 #***********************************************************************
@@ -143,7 +143,7 @@
   0.0	= drll ! Min distance between opposite sign lepton pairs
   0.0	= drll_sf ! Min distance between opp. sign same-flavor lepton pairs
   0.0	= mll ! Min inv. mass of all opposite sign lepton pairs
-  0.0	= mll_sf ! Min inv. mass of all opp. sign same-flavor lepton pairs
+  30.0	= mll_sf ! Min inv. mass of all opp. sign same-flavor lepton pairs
 #***********************************************************************
 # Photon-isolation cuts, according to hep-ph/9801442. When ptgmin=0,   *
 # all the other parameters are ignored.                                *

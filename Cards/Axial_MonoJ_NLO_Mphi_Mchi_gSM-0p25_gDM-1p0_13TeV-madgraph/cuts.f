@@ -36,8 +36,8 @@ c difficulty in using this.
 c
 C     external functions that can be used. Some are defined in this
 C     file, others are in ./Source/kin_functions.f
-      REAL*8 R2_04,invm2_04,ptZ,pt_04,eta_04,pt,eta
-      external R2_04,invm2_04,ptZ,pt_04,eta_04,pt,eta
+      REAL*8 R2_04,ptZ,invm2_04,pt_04,eta_04,pt,eta
+      external R2_04,ptZ,invm2_04,pt_04,eta_04,pt,eta
 c local integers
       integer i,j
 c jet cluster algorithm
@@ -69,7 +69,6 @@ c are filled from the PDG codes (iPDG array) in this function.
 
       passcuts_user=.true. ! event is okay; otherwise it is changed
 
-
       do i=0,nexternal
          do j=i+1,nexternal
             if ((abs(ipdg(i)).eq.18).and.(ipdg(i).eq.-ipdg(j))) then
@@ -80,7 +79,6 @@ c are filled from the PDG codes (iPDG array) in this function.
             endif
          enddo
       enddo
-
 
 C***************************************************************
 C***************************************************************
@@ -93,13 +91,13 @@ c
 c find the charged leptons (also used in the photon isolation cuts below)
       do i=1,nexternal
          if(istatus(i).eq.1 .and.
-     &    (ipdg(i).eq.11 .or. ipdg(i).eq.13 .or. ipdg(i).eq.18)) then
+     &    (ipdg(i).eq.11 .or. ipdg(i).eq.13 .or. ipdg(i).eq.15)) then
             is_a_lm(i)=.true.
          else
             is_a_lm(i)=.false.
          endif
          if(istatus(i).eq.1 .and.
-     &    (ipdg(i).eq.-11 .or. ipdg(i).eq.-13 .or. ipdg(i).eq.-18)) then
+     &    (ipdg(i).eq.-11 .or. ipdg(i).eq.-13 .or. ipdg(i).eq.-15)) then
             is_a_lp(i)=.true.
          else
             is_a_lp(i)=.false.
@@ -441,8 +439,6 @@ c Masses of external particles
       double precision pmass(nexternal)
       common/to_mass/pmass
 c PDG codes of particles
-      integer maxflow
-      parameter (maxflow=999)
       integer idup(nexternal,maxproc),mothup(2,nexternal,maxproc),
      &     icolup(2,nexternal,maxflow),niprocs
       common /c_leshouche_inc/idup,mothup,icolup,niprocs
@@ -899,8 +895,6 @@ c-----
       implicit none
       include "genps.inc"
       include 'nexternal.inc'
-      integer maxflow
-      parameter (maxflow=999)
       integer idup(nexternal,maxproc),mothup(2,nexternal,maxproc),
      &     icolup(2,nexternal,maxflow),niprocs
 c      include 'leshouche.inc'
@@ -918,8 +912,6 @@ c
       implicit none
       include "genps.inc"
       include 'nexternal.inc'
-      integer    maxflow
-      parameter (maxflow=999)
       integer idup(nexternal,maxproc)
       integer mothup(2,nexternal,maxproc)
       integer icolup(2,nexternal,maxflow)
@@ -935,32 +927,49 @@ c
       end
 
 
-      subroutine unweight_function(p_born,unwgtfun)
-c This is a user-defined function to which to unweight the events
-c A non-flat distribution will generate events with a certain
-c weight. This is particularly useful to generate more events
-c (with smaller weight) in tails of distributions.
-c It computes the unwgt factor from the momenta and multiplies
-c the weight that goes into MINT (or vegas) with this factor.
-c Before writing out the events (or making the plots), this factor
-c is again divided out.
-c This function should be called with the Born momenta to be sure
-c that it stays the same for the events, counter-events, etc.
-c A value different from 1 makes that MINT (or vegas) does not list
-c the correct cross section.
+      subroutine bias_weight_function(p,ipdg,bias_wgt)
+c This is a user-defined function to which to bias the event generation.
+c A non-flat distribution will generate events with a certain weight
+c inversely proportinal to the bias_wgt. This is particularly useful to
+c generate more events (with smaller weight) in tails of distributions.
+c It computes the bias_wgt factor from the momenta and multiplies the
+c weight that goes into MINT (or vegas) with this factor.  Before
+c writing out the events (or making the plots), this factor is again
+c divided out. A value different from 1 makes that MINT (or vegas) does
+c not list the correct cross section, but the cross section can still be
+c computed from summing all the weights of the events (and dividing by
+c the number of events). Since the weights of the events are no longer
+c identical for all events, the statistical uncertainty on this total
+c cross section can be much larger than without including the bias.
+c
+c The 'bias_wgt' should be a IR-safe function of the momenta.
+c      
+c For this to be used, the 'event_norm' option in the run_card should be
+c set to
+c      'bias' = event_norm      
+c
       implicit none
       include 'nexternal.inc'
-      double precision unwgtfun,p_born(0:3,nexternal-1),shat,sumdot
-      external sumdot
+      double precision bias_wgt,p(0:3,nexternal),H_T
+      integer ipdg(nexternal),i,j
 
-      unwgtfun=1d0
+      bias_wgt=1d0
 
-c How to enhance the tails is very process dependent. But, it is
-c probably easiest to enhance the tails using shat, e.g.:
-c      shat=sumdot(p_born(0,1),p_born(0,2),1d0)
-c      unwgtfun=max(100d0**2,shat)/100d0**2
-c      unwgtfun=unwgtfun**2
-
+c How to enhance the tails is very process dependent. For example for
+c top quark production one could use:
+      do i=1,nexternal
+        do j=i+1,nexternal
+           if (abs(ipdg(i)).eq.18.and.(ipdg(i).eq.-ipdg(j))) then
+              bias_wgt=sqrt(p(1,i)**2+p(2,i)**2)**3
+           endif
+        enddo
+      enddo
+c Or to use H_T^2 one does     
+c      H_T=0d0
+c      do i=3,nexternal
+c         H_T=H_T+sqrt(max(0d0,(p(0,i)+p(3,i))*(p(0,i)-p(3,i))))
+c      enddo
+c      bias_wgt=H_T**2
       return
       end
 

@@ -1,5 +1,6 @@
 change mode NLO
 change helicity False
+change rwgt_dir rwgt
 #0 start of scalar
 launch --rwgt_name=gdms_1_gdmp_0_gs_0p1_gp_0
 set dminputs 3  1
